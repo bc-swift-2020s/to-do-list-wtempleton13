@@ -141,7 +141,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="save" id="ebF-Z1-jm5">
                             <connections>
-                                <action selector="saveButtonPressed:" destination="kzA-UZ-Sbk" id="QFU-xI-epn"/>
+                                <segue destination="QyZ-av-ElP" kind="unwind" unwindAction="unwindFromDetailWithSegue:" id="UVE-IH-leG"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -153,6 +153,7 @@
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bqh-qc-2hQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="QyZ-av-ElP" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3026.25" y="138.38028169014083"/>
         </scene>
