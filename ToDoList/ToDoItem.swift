@@ -14,6 +14,7 @@ struct ToDoItem: Codable {
     var notes: String
     var reminderSet: Bool
     var notificationID: String?
+    var completed: Bool
 }
 
 

@@ -34,15 +34,13 @@ class ToDoListViewController: UIViewController {
                 print("ERROR \(error!.localizedDescription)")
                 return
             }
-                if granted {
-                    print("Notifactions Authorization Granted")
-                } else {
-                    print("User has denied Notifcations")
-                }
-                
+            if granted {
+                print("Notifactions Authorization Granted")
+            } else {
+                print("User has denied Notifcations")
             }
-
         }
+    }
     
     func setNotifications() {
         guard toDoItems.count > 0 else {
@@ -50,7 +48,7 @@ class ToDoListViewController: UIViewController {
         }
         // remove all notifications
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        
+
         // recreate with updated data
         for index in 0..<toDoItems.count {
             if toDoItems[index].reminderSet {
@@ -69,16 +67,16 @@ class ToDoListViewController: UIViewController {
         content.body = body
         content.sound = sound
         content.badge = badgeNumber
-        
+
         // create trigger
         var dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
         dateComponents.second = 00
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        
+
         // create request
         let notificationID = UUID().uuidString
         let request = UNNotificationRequest(identifier: notificationID, content: content, trigger: trigger)
-        
+
         // register request with notification center
         UNUserNotificationCenter.current().add(request) { (error) in
             if let error = error {
@@ -90,7 +88,6 @@ class ToDoListViewController: UIViewController {
         return notificationID
     }
 
-    
     func loadData() {
         let directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let documentURL = directoryURL.appendingPathComponent("todos")
@@ -113,6 +110,7 @@ class ToDoListViewController: UIViewController {
         let data = try? jsonEncoder.encode(toDoItems)
         do {
             try data?.write(to: documentURL, options: .noFileProtection)
+            setNotifications()
         } catch {
             print("ERROR: DATA DID NOT SAVE \(error.localizedDescription)")
         }
@@ -156,7 +154,15 @@ class ToDoListViewController: UIViewController {
     
 }
 
-extension ToDoListViewController: UITableViewDelegate, UITableViewDataSource {
+extension ToDoListViewController: UITableViewDelegate, UITableViewDataSource, ListTableViewCellDelegate {
+    func checkBoxToggle(sender: ListTableViewCell) {
+        if let selectedIndexPath = tableView.indexPath(for: sender) {
+            toDoItems[selectedIndexPath.row].completed = !toDoItems[selectedIndexPath.row].completed
+            tableView.reloadRows(at: [selectedIndexPath], with: .automatic)
+            saveData()
+        }
+    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         print("numberOfRowsInSection was just called. Returning \(toDoItems.count)")
@@ -165,8 +171,9 @@ extension ToDoListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         print("cellForRowAt was just called for indexPath.row = \(indexPath.row) which is the cell containing \(toDoItems[indexPath.row])")
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.textLabel?.text = toDoItems[indexPath.row].name
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ListTableViewCell
+        cell.delegate = self
+        cell.toDoItem = toDoItems[indexPath.row]
         return cell
     }
     
