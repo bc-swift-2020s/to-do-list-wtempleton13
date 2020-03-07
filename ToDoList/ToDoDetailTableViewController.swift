@@ -61,16 +61,32 @@ class ToDoDetailTableViewController: UITableViewController {
         enableDisableSaveButton(text: nameField.text!)
     }
     
+    func updateReminderSwitch() {
+        LocalNotificationManager.isAuthorized { (authorized) in
+            DispatchQueue.main.async {
+                if !authorized && self.reminderSwitch.isOn {
+                    self.oneButtonAlert(title: "User Has Not Allowed Notifications", message: "To recieve alerts for reminders enable notifications. Go to Settings > To Do List > Notifications > Allow Notifications")
+                    self.reminderSwitch.isOn = false
+                }
+                self.view.endEditing(true)
+                // same as if { } else {} in view did load, just using tenriary operator
+                self.dateLabel.textColor = (self.reminderSwitch.isOn ? .black : .gray)
+                self.tableView.beginUpdates()
+                self.tableView.endUpdates()
+            }
+        }
+    }
+   
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         toDoItem = ToDoItem(name: nameField.text!, date: datePicker.date, notes: noteView.text, reminderSet: reminderSwitch.isOn, completed: toDoItem.completed)
     }
     
     func enableDisableSaveButton(text: String) {
         if text.count > 0 {
-             saveBarButton.isEnabled = true
-         } else {
-             saveBarButton.isEnabled = false
-         }
+            saveBarButton.isEnabled = true
+        } else {
+            saveBarButton.isEnabled = false
+        }
     }
     
     @IBAction func cancelButtonPressed(_ sender: UIBarButtonItem) {
@@ -83,11 +99,7 @@ class ToDoDetailTableViewController: UITableViewController {
         }
     }
     @IBAction func reminderSwitchChanged(_ sender: UISwitch) {
-        self.view.endEditing(true)
-        // same as if { } else {} in view did load, just using tenriary operator
-        dateLabel.textColor = (reminderSwitch.isOn ? .black : .gray)
-        tableView.beginUpdates()
-        tableView.endUpdates()
+        updateReminderSwitch()
     }
     
     @IBAction func datePickerChanged(_ sender: UIDatePicker) {
