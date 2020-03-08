@@ -21,7 +21,7 @@ struct LocalNotificationManager {
               if granted {
                   print("✅ Notifications Authorization Granted")
               } else {
-                  print("📵 User has denied Notifcations")
+                  print("🚫 User has denied Notifcations")
                 DispatchQueue.main.async {
                     viewController.oneButtonAlert(title: "User Has Not Allowed Notifications", message: "To recieve alerts for reminders enable notifications. Go to Settings > To Do List > Notifications > Allow Notifications")
                 }
